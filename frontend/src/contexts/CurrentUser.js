@@ -1,30 +1,78 @@
-import { useEffect, createContext, useState } from "react";
+// import { createContext, useState, useEffect } from "react";
 
 
-export const CurrentUser = createContext()
+// export const CurrentUser = createContext()
+
+// function CurrentUserProvider({ children }) {
+
+//     const [currentUser, setCurrentUser] = useState(null)
+
+//     useEffect(() => {
+
+//         const getLoggedInUser = async () => {
+//             let response = await fetch('http://localhost:5000/authentication/profile', {
+//                 // credentials: 'include'
+//                 headers: {
+//                     'Authorization': `Bearer ${localStorage.getItem('token')}`
+//             }
+//             });        
+        
+//             let user = await response.json()
+//             setCurrentUser(user)
+//         }
+//         getLoggedInUser()
+//     }, [])
+
+//     return (
+//         <CurrentUser.Provider value={{ currentUser, setCurrentUser }}>
+//             {children}
+//         </CurrentUser.Provider>
+//     )
+// }
+import React, { createContext, useState, useEffect } from "react";
+
+export const CurrentUser = createContext();
 
 function CurrentUserProvider({ children }) {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    const [currentUser, setCurrentUser] = useState(null)
+  useEffect(() => {
+    const getLoggedInUser = async () => {
+      try {
+        let response = await fetch('http://localhost:5000/authentication/profile', {
+          // credentials: 'include',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
 
-    useEffect(() => {
-        const getLoggedInUser = async () => {
-            let response = await fetch('http://localhost:5000/authentication/profile', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-            let user = await response.json()
-            setCurrentUser(user)
+        
+
+        if (response.status !== 200) {
+            throw new Error("User not logged in");
+            }   
+        let user = await response.json();
+        setCurrentUser(user);
+        setLoading(false);
         }
-        getLoggedInUser()
-    }, [])
+        catch (err) {
+            setError(err.message);
+            setLoading(false);
+        }
+    }
+    getLoggedInUser();
+    }
+    , []);
 
     return (
-        <CurrentUser.Provider value={{ currentUser, setCurrentUser }}>
+        <CurrentUser.Provider value={{ currentUser, setCurrentUser, loading, error }}>
             {children}
         </CurrentUser.Provider>
     )
 }
 
-export default CurrentUserProvider
+
+export default CurrentUserProvider;
+
