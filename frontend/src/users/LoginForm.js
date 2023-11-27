@@ -25,7 +25,8 @@ function LoginForm() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(credentials)
-        })
+        });
+        console.log('Response status:', response.status);
 
         const data = await response.json()
 
