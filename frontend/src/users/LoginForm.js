@@ -14,24 +14,22 @@ function LoginForm() {
     })
 
     const [errorMessage, setErrorMessage] = useState(null)
-    
-      
+
     async function handleSubmit(e) {
         e.preventDefault()
         const response = await fetch(`http://localhost:5000/authentication/`, {
             method: 'POST',
-            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(credentials)
-        });
-        console.log('Response status:', response.status);
+        })
 
         const data = await response.json()
 
         if (response.status === 200) {
             setCurrentUser(data.user)
+            localStorage.setItem('token', data.token)
             history.push(`/`)
         } else {
             setErrorMessage(data.message)
@@ -80,8 +78,6 @@ function LoginForm() {
             </form>
         </main>
     )
-
-}   
-
+}
 
 export default LoginForm
